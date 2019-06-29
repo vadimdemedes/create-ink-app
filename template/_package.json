@@ -1,0 +1,31 @@
+{
+	"name": "%NAME%",
+	"version": "0.0.0",
+	"license": "MIT",
+	"bin": "cli.js",
+	"engines": {
+		"node": ">=8"
+	},
+	"scripts": {
+		"test": "xo && ava"
+	},
+	"files": [
+		"cli.js",
+		"ui.js"
+	],
+	"dependencies": {},
+	"devDependencies": {},
+	"ava": {
+		"require": [
+			"@babel/register"
+		]
+	},
+	"babel": {
+		"presets": [
+			"@babel/preset-react"
+		]
+	},
+	"xo": {
+		"extends": "xo-react"
+	}
+}

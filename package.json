@@ -1,0 +1,47 @@
+{
+	"name": "create-ink-app",
+	"version": "0.0.0",
+	"description": "Generate a starter Ink app",
+	"license": "MIT",
+	"repository": "vadimdemedes/create-ink-app",
+	"author": {
+		"name": "Vadim Demedes",
+		"email": "vdemedes@gmail.com",
+		"url": "vadimdemedes.com"
+	},
+	"bin": "cli.js",
+	"engines": {
+		"node": ">=8"
+	},
+	"scripts": {
+		"test": "xo"
+	},
+	"files": [
+		"index.js",
+		"cli.js",
+		"template"
+	],
+	"keywords": [
+		"ink",
+		"ink-app",
+		"ink",
+		"ink-app",
+		"cli"
+	],
+	"dependencies": {
+		"cpy": "^7.2.0",
+		"execa": "^1.0.0",
+		"listr": "^0.14.3",
+		"meow": "^5.0.0",
+		"replace-string": "^3.0.0",
+		"slugify": "^1.3.4"
+	},
+	"devDependencies": {
+		"xo": "^0.21.0"
+	},
+	"xo": {
+		"ignores": [
+			"template"
+		]
+	}
+}
