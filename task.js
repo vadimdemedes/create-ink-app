@@ -22,7 +22,6 @@ const copyWithTemplate = async (from, to, variables) => {
 
 const JavascriptCopyFiles = async (fromPath, toPath) => {
 	const pkgName = slugify(path.basename(process.cwd()));
-	console.log(pkgName);
 
 	const variables = {
 		name: pkgName
@@ -67,12 +66,59 @@ const JavascriptInstallDependencies = async () => {
 	]);
 }
 
-const TypescriptCopyFiles = (fromPath, toPath) => {
+const TypescriptCopyFiles = async (fromPath, toPath) => {
+	const pkgName = slugify(path.basename(process.cwd()));
 
+	const variables = {
+		name: pkgName
+	};
+
+	return Promise.all([
+		copyWithTemplate(fromPath('_package.json'), toPath('package.json'), variables),
+		copyWithTemplate(fromPath('readme.md'), toPath('readme.md'), variables),
+		copyWithTemplate(fromPath('src/cli.tsx'), toPath('src/cli.tsx'), variables),
+		cpy(fromPath('src/ui.tsx'), process.cwd()),
+		cpy(fromPath('src/test.tsx'), process.cwd()),
+		cpy(fromPath('tsconfig.json'), process.cwd()),
+		cpy([
+			fromPath('.editorconfig'),
+			fromPath('.gitattributes'),
+			fromPath('.gitignore'),
+			fromPath('.babelrc')
+		], process.cwd())
+	]);
 }
 
-const TypescriptInstallDependencies = () => {
+const TypescriptInstallDependencies = async () => {
+	await execa('npm', [
+		'install',
+		'ink',
+		'meow',
+		'react'
+	]);
 
+	return execa('npm', [
+		'install',
+		'--save-dev',
+		'xo',
+		'ava',
+		'chalk',
+		'@babel/preset-react',
+		'@babel/register',
+		'@types/node',
+		'@types/react',
+		'@typescript-eslint/eslint-plugin',
+		'@typescript-eslint/parser',
+		'eslint-config-xo',
+		'eslint-config-xo-react',
+		'eslint-config-xo-typescript',
+		'eslint-plugin-react',
+		'eslint-plugin-react-hooks',
+		'ink-testing-library',
+		'ts-node',
+		'typescript',
+		'xo'
+	]);
 }
 
 module.exports = {

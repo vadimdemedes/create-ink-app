@@ -2,7 +2,7 @@
 const path = require('path');
 const execa = require('execa');
 const Listr = require('listr');
-const { JavascriptCopyFiles, JavascriptInstallDependencies } = require('./task');
+const { JavascriptCopyFiles, JavascriptInstallDependencies, TypescriptCopyFiles, TypescriptInstallDependencies } = require('./task');
 
 const defaults = {
 	template: 'javascript'
