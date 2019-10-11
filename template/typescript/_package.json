@@ -1,0 +1,60 @@
+{
+  "name": "%NAME%",
+	"version": "0.0.0",
+	"license": "MIT",
+  "bin": "lib/cli.js",
+  "engines": {
+    "node": ">=8"
+  },
+  "scripts": {
+    "compile": "tsc",
+    "test": "xo && ava"
+  },
+  "files": [
+    "cli.js",
+    "ui.js"
+  ],
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {},
+  "ava": {
+    "files": [
+      "src/test.tsx"
+    ],
+    "extensions": [
+      "ts",
+      "tsx"
+    ],
+    "require": [
+      "ts-node/register",
+      "@babel/register"
+    ],
+    "babel": {
+      "testOptions": {
+        "presets": [
+          "@babel/preset-react"
+        ]
+      }
+    },
+    "compileEnhancements": false
+  },
+  "xo": {
+    "extends": [
+      "xo-typescript",
+      "xo-react"
+    ],
+    "extensions": [
+      "ts",
+      "tsx"
+    ],
+    "ignores": [
+      "lib"
+    ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "xo",
+      "xo-typescript"
+    ]
+  }
+}
