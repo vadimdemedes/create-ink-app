@@ -3,14 +3,23 @@
 const meow = require('meow');
 const createInkApp = require('.');
 
-meow(`
+const cli = meow(`
 	Usage
 		$ mkdir my-cli
 		$ cd my-cli
-	  $ create-ink-app
+	  $ create-ink-app <template>
+
+	Flags
+		--help
+
+	Commands
+		create-ink-app <template>
+
+	Examples
+		$ create-ink-app typescript
 `);
 
-createInkApp().catch(error => {
+createInkApp(cli.input).catch(error => {
 	console.error(error.stack);
 	process.exit(1);
 });
