@@ -2,7 +2,8 @@
 const path = require('path');
 const execa = require('execa');
 const Listr = require('listr');
-const { JavascriptCopyFiles, JavascriptInstallDependencies, TypescriptCopyFiles, TypescriptInstallDependencies } = require('./task');
+const {javascriptCopyFiles, javascriptInstallDependencies,
+	typescriptCopyFiles, typescriptInstallDependencies, typescriptCompile} = require('./task');
 
 const defaults = {
 	template: 'javascript'
@@ -10,26 +11,43 @@ const defaults = {
 
 const toPath = file => path.join(process.cwd(), file);
 
-const getTemplateInput = (input) => {
-	if (input.length < 1) {
+const getTemplateInput = input => {
+	if (input.length === 0) {
 		return defaults.template;
 	}
 
 	return input.shift();
 };
 
-module.exports = (input) => {
+module.exports = input => {
 	const template = getTemplateInput(input);
 	const fromPath = file => path.join(__dirname, `template/${template}`, file);
 
 	const tasks = new Listr([
 		{
 			title: 'Copy files',
-			task: () => JavascriptCopyFiles(fromPath, toPath)
+			task: () => javascriptCopyFiles(fromPath, toPath),
+			enabled: () => template === 'javascript'
+		},
+		{
+			title: 'Copy files',
+			task: () => typescriptCopyFiles(fromPath, toPath),
+			enabled: () => template === 'typescript'
 		},
 		{
 			title: 'Install dependencies',
-			task: () => JavascriptInstallDependencies()
+			task: () => javascriptInstallDependencies(),
+			enabled: () => template === 'javascript'
+		},
+		{
+			title: 'Install dependencies',
+			task: () => typescriptInstallDependencies(),
+			enabled: () => template === 'typescript'
+		},
+		{
+			title: 'Compile typescript',
+			task: () => typescriptCompile(),
+			enabled: () => template === 'typescript'
 		},
 		{
 			title: 'Link executable',

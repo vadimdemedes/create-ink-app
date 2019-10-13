@@ -11,8 +11,7 @@
     "test": "xo && ava"
   },
   "files": [
-    "cli.js",
-    "ui.js"
+    "lib"
   ],
   "license": "MIT",
   "devDependencies": {},

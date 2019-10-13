@@ -1,10 +1,10 @@
-const { promisify } = require('util');
+const {promisify} = require('util');
+const path = require('path');
+const fs = require('fs');
 const execa = require('execa');
 const slugify = require('slugify');
 const replaceString = require('replace-string');
-const path = require('path');
 const cpy = require('cpy');
-const fs = require('fs');
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -20,7 +20,7 @@ const copyWithTemplate = async (from, to, variables) => {
 	await writeFile(to, generatedSource);
 };
 
-const JavascriptCopyFiles = async (fromPath, toPath) => {
+const javascriptCopyFiles = async (fromPath, toPath) => {
 	const pkgName = slugify(path.basename(process.cwd()));
 
 	const variables = {
@@ -39,9 +39,9 @@ const JavascriptCopyFiles = async (fromPath, toPath) => {
 			fromPath('.gitignore')
 		], process.cwd())
 	]);
-}
+};
 
-const JavascriptInstallDependencies = async () => {
+const javascriptInstallDependencies = async () => {
 	await execa('npm', [
 		'install',
 		'meow',
@@ -64,32 +64,38 @@ const JavascriptInstallDependencies = async () => {
 		'eslint-plugin-react',
 		'eslint-plugin-react-hooks'
 	]);
-}
+};
 
-const TypescriptCopyFiles = async (fromPath, toPath) => {
+const typescriptCopyFiles = async (fromPath, toPath) => {
 	const pkgName = slugify(path.basename(process.cwd()));
 
 	const variables = {
 		name: pkgName
 	};
 
+	if (!fs.existsSync('src')) {
+		fs.mkdirSync('src');
+	}
+
 	return Promise.all([
 		copyWithTemplate(fromPath('_package.json'), toPath('package.json'), variables),
 		copyWithTemplate(fromPath('readme.md'), toPath('readme.md'), variables),
 		copyWithTemplate(fromPath('src/cli.tsx'), toPath('src/cli.tsx'), variables),
-		cpy(fromPath('src/ui.tsx'), process.cwd()),
-		cpy(fromPath('src/test.tsx'), process.cwd()),
-		cpy(fromPath('tsconfig.json'), process.cwd()),
 		cpy([
+			fromPath('/src/ui.tsx'),
+			fromPath('src/test.tsx')
+		], toPath('src')),
+		cpy([
+			fromPath('tsconfig.json'),
 			fromPath('.editorconfig'),
 			fromPath('.gitattributes'),
 			fromPath('.gitignore'),
 			fromPath('.babelrc')
 		], process.cwd())
 	]);
-}
+};
 
-const TypescriptInstallDependencies = async () => {
+const typescriptInstallDependencies = async () => {
 	await execa('npm', [
 		'install',
 		'ink',
@@ -119,11 +125,19 @@ const TypescriptInstallDependencies = async () => {
 		'typescript',
 		'xo'
 	]);
-}
+};
+
+const typescriptCompile = async () => {
+	return execa('npm', [
+		'run',
+		'compile'
+	]);
+};
 
 module.exports = {
-	JavascriptCopyFiles,
-	JavascriptInstallDependencies,
-	TypescriptCopyFiles,
-	TypescriptInstallDependencies
-}
+	javascriptCopyFiles,
+	javascriptInstallDependencies,
+	typescriptCopyFiles,
+	typescriptInstallDependencies,
+	typescriptCompile
+};

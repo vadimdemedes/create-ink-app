@@ -24,8 +24,6 @@
 	"keywords": [
 		"ink",
 		"ink-app",
-		"ink",
-		"ink-app",
 		"cli"
 	],
 	"dependencies": {
