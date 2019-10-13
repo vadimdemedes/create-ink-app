@@ -82,7 +82,7 @@ const typescriptCopyFiles = async (fromPath, toPath) => {
 		copyWithTemplate(fromPath('readme.md'), toPath('readme.md'), variables),
 		copyWithTemplate(fromPath('src/cli.tsx'), toPath('src/cli.tsx'), variables),
 		cpy([
-			fromPath('/src/ui.tsx'),
+			fromPath('src/ui.tsx'),
 			fromPath('src/test.tsx')
 		], toPath('src')),
 		cpy([
