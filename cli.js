@@ -7,19 +7,29 @@ const cli = meow(`
 	Usage
 		$ mkdir my-cli
 		$ cd my-cli
-	  $ create-ink-app <template>
+	  $ create-ink-app --ts
 
 	Flags
 		--help
+		--typescript, --ts
 
 	Commands
-		create-ink-app <template>
+		create-ink-app
 
 	Examples
-		$ create-ink-app typescript
-`);
+		$ create-ink-app
+		$ create-ink-app --typescript
+`, {
+	flags: {
+		typescript: {
+			type: 'boolean',
+			default: false,
+			alias: 'ts'
+		}
+	}
+});
 
-createInkApp(cli.input).catch(error => {
+createInkApp(cli.flags).catch(error => {
 	console.error(error.stack);
 	process.exit(1);
 });

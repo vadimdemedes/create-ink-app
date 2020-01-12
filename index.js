@@ -11,16 +11,16 @@ const defaults = {
 
 const toPath = file => path.join(process.cwd(), file);
 
-const getTemplateInput = input => {
-	if (input.length === 0) {
+const getTemplateFlag = typescript => {
+	if (!typescript) {
 		return defaults.template;
 	}
 
-	return input.shift();
+	return 'typescript';
 };
 
-module.exports = input => {
-	const template = getTemplateInput(input);
+module.exports = flags => {
+	const template = getTemplateFlag(flags.typescript);
 	const fromPath = file => path.join(__dirname, `template/${template}`, file);
 
 	const tasks = new Listr([
