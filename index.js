@@ -45,7 +45,7 @@ module.exports = flags => {
 			enabled: () => template === 'typescript'
 		},
 		{
-			title: 'Compile typescript',
+			title: 'Compile TypeScript',
 			task: () => typescriptCompile(),
 			enabled: () => template === 'typescript'
 		},
