@@ -7,7 +7,7 @@
     "node": ">=8"
   },
   "scripts": {
-    "compile": "tsc",
+    "build": "tsc",
     "test": "xo && ava"
   },
   "files": [
