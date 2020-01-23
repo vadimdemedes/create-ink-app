@@ -146,7 +146,7 @@ module.exports = flags => {
 		},
 		{
 			title: 'Compile typescript',
-			task: () => execa('npm', ['run', 'compile']),
+			task: () => execa('npm', ['run', 'build']),
 			enabled: () => flags.typescript
 		},
 		{
