@@ -39,8 +39,8 @@ const install = async ({typescript}) => {
 
 	const jsDependencies = [
 		[
-			'meow',
 			'ink',
+			'meow',
 			'react',
 			'prop-types',
 			'import-jsx'
@@ -74,6 +74,7 @@ const install = async ({typescript}) => {
 			'@babel/register',
 			'@types/node',
 			'@types/react',
+			'@types/meow',
 			'@typescript-eslint/eslint-plugin',
 			'@typescript-eslint/parser',
 			'eslint-config-xo',
