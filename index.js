@@ -101,38 +101,42 @@ const copyFiles = ({typescript}) => {
 		name: pkgName
 	};
 
-	const jsFiles = [
-		copyWithTemplate(fromPath('_package.json'), toPath('package.json'), variables),
-		copyWithTemplate(fromPath('readme.md'), toPath('readme.md'), variables),
-		copyWithTemplate(fromPath('cli.js'), toPath('cli.js'), variables),
-		cpy(fromPath('ui.js'), process.cwd()),
-		cpy(fromPath('test.js'), process.cwd()),
-		cpy([
-			fromPath('.editorconfig'),
-			fromPath('.gitattributes'),
-			fromPath('.gitignore')
-		], process.cwd())
-	];
+	const jsFiles = () => {
+		return [
+			copyWithTemplate(fromPath('_package.json'), toPath('package.json'), variables),
+			copyWithTemplate(fromPath('readme.md'), toPath('readme.md'), variables),
+			copyWithTemplate(fromPath('cli.js'), toPath('cli.js'), variables),
+			cpy(fromPath('ui.js'), process.cwd()),
+			cpy(fromPath('test.js'), process.cwd()),
+			cpy([
+				fromPath('.editorconfig'),
+				fromPath('.gitattributes'),
+				fromPath('.gitignore')
+			], process.cwd())
+		];
+	};
 
-	const tsFiles = [
-		fs.mkdirSync('src'),
-		copyWithTemplate(fromPath('_package.json'), toPath('package.json'), variables),
-		copyWithTemplate(fromPath('readme.md'), toPath('readme.md'), variables),
-		copyWithTemplate(fromPath('src/cli.tsx'), toPath('src/cli.tsx'), variables),
-		cpy([
-			fromPath('src/ui.tsx'),
-			fromPath('src/test.tsx')
-		], toPath('src')),
-		cpy([
-			fromPath('tsconfig.json'),
-			fromPath('.editorconfig'),
-			fromPath('.gitattributes'),
-			fromPath('.gitignore'),
-			fromPath('.babelrc')
-		], process.cwd())
-	];
+	const tsFiles = () => {
+		return [
+			fs.mkdirSync('src'),
+			copyWithTemplate(fromPath('_package.json'), toPath('package.json'), variables),
+			copyWithTemplate(fromPath('readme.md'), toPath('readme.md'), variables),
+			copyWithTemplate(fromPath('src/cli.tsx'), toPath('src/cli.tsx'), variables),
+			cpy([
+				fromPath('src/ui.tsx'),
+				fromPath('src/test.tsx')
+			], toPath('src')),
+			cpy([
+				fromPath('tsconfig.json'),
+				fromPath('.editorconfig'),
+				fromPath('.gitattributes'),
+				fromPath('.gitignore'),
+				fromPath('.babelrc')
+			], process.cwd())
+		];
+	};
 
-	return typescript ? Promise.all(tsFiles) : Promise.all(jsFiles);
+	return typescript ? Promise.all(tsFiles()) : Promise.all(jsFiles());
 };
 
 module.exports = flags => {
