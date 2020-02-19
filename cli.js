@@ -7,7 +7,7 @@ const cli = meow(`
 	Usage
 		$ mkdir my-cli
 		$ cd my-cli
-	  $ create-ink-app --ts
+	  $ create-ink-app --typescript
 
 	Flags
 		--help
