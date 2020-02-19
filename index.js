@@ -147,7 +147,7 @@ module.exports = flags => {
 		},
 		{
 			title: 'Install dependencies',
-			task: async () => install(flags)
+			task: () => install(flags)
 		},
 		{
 			title: 'Compile typescript',
