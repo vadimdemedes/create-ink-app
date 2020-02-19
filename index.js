@@ -93,7 +93,7 @@ const install = async ({typescript}) => {
 };
 
 const copyFiles = ({typescript}) => {
-	const template = getTemplateFlag(typescript);
+	const template = typescript ? 'typescript' : 'javascript';
 	const fromPath = file => path.join(__dirname, `template/${template}`, file);
 	const toPath = file => path.join(process.cwd(), file);
 	const pkgName = slugify(path.basename(process.cwd()));
