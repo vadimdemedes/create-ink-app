@@ -11,7 +11,7 @@ const cli = meow(`
 
 	Flags
 		--help
-		--typescript, --ts
+		--typescript, --ts    Generate a TypeScript-based project
 
 	Commands
 		create-ink-app
