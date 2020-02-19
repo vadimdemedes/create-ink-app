@@ -143,7 +143,7 @@ module.exports = flags => {
 	const tasks = new Listr([
 		{
 			title: 'Copy files',
-			task: async () => copyFiles(flags)
+			task: () => copyFiles(flags)
 		},
 		{
 			title: 'Install dependencies',
