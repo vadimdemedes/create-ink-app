@@ -37,29 +37,34 @@ module.exports = () => {
 				};
 
 				return Promise.all([
-					copyWithTemplate(fromPath('_package.json'), toPath('package.json'), variables),
-					copyWithTemplate(fromPath('readme.md'), toPath('readme.md'), variables),
+					copyWithTemplate(
+						fromPath('_package.json'),
+						toPath('package.json'),
+						variables
+					),
+					copyWithTemplate(
+						fromPath('readme.md'),
+						toPath('readme.md'),
+						variables
+					),
 					copyWithTemplate(fromPath('cli.js'), toPath('cli.js'), variables),
 					cpy(fromPath('ui.js'), process.cwd()),
 					cpy(fromPath('test.js'), process.cwd()),
-					cpy([
-						fromPath('.editorconfig'),
-						fromPath('.gitattributes'),
-						fromPath('.gitignore')
-					], process.cwd())
+					cpy(
+						[
+							fromPath('.editorconfig'),
+							fromPath('.gitattributes'),
+							fromPath('.gitignore')
+						],
+						process.cwd()
+					)
 				]);
 			}
 		},
 		{
 			title: 'Install dependencies',
 			task: async () => {
-				await execa('npm', [
-					'install',
-					'meow',
-					'ink',
-					'react',
-					'import-jsx'
-				]);
+				await execa('npm', ['install', 'meow', 'ink', 'react', 'import-jsx']);
 
 				return execa('npm', [
 					'install',

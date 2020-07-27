@@ -2,7 +2,6 @@
 
 > Generate a starter [Ink](https://github.com/vadimdemedes/ink) app
 
-
 ## Usage
 
 This helper tool scaffolds out basic project structure for Ink apps and lets you avoid the boilerplate and get to building beautiful CLIs in no time.
@@ -14,8 +13,3 @@ $ npx create-ink-app
 ```
 
 ![](media/demo.gif)
-
-
-## License
-
-MIT © [Vadim Demedes](https://vadimdemedes.com)
