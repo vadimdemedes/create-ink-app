@@ -1,4 +1,4 @@
-# create-ink-app [![Build Status](https://travis-ci.org/vadimdemedes/create-ink-app.svg?branch=master)](https://travis-ci.org/vadimdemedes/create-ink-app)
+# create-ink-app [![test](https://github.com/vadimdemedes/create-ink-app/workflows/test/badge.svg)](https://github.com/vadimdemedes/create-ink-app/actions)
 
 > Generate a starter [Ink](https://github.com/vadimdemedes/ink) app
 
