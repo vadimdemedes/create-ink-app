@@ -58,7 +58,6 @@ module.exports = () => {
 					'meow',
 					'ink',
 					'react',
-					'prop-types',
 					'import-jsx'
 				]);
 
@@ -67,8 +66,10 @@ module.exports = () => {
 					'--save-dev',
 					'xo',
 					'ava',
+					'@ava/babel',
 					'ink-testing-library',
 					'chalk',
+					'@babel/preset-env',
 					'@babel/preset-react',
 					'@babel/register',
 					'eslint-config-xo-react',

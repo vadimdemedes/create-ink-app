@@ -1,20 +1,11 @@
 'use strict';
 const React = require('react');
-const PropTypes = require('prop-types');
-const {Text, Color} = require('ink');
+const {Text} = require('ink');
 
-const App = ({name}) => (
+const App = ({name = 'Stranger'}) => (
 	<Text>
-		Hello, <Color green>{name}</Color>
+		Hello, <Text color="green">{name}</Text>
 	</Text>
 );
-
-App.propTypes = {
-	name: PropTypes.string
-};
-
-App.defaultProps = {
-	name: 'Stranger'
-};
 
 module.exports = App;
