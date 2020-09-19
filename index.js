@@ -33,18 +33,22 @@ const fromPath = file => path.join(__dirname, templatePath, file);
 const toPath = file => path.join(process.cwd(), file);
 
 const copyTasks = variables => {
-	const baseCopies = [
+	const commonCopies = [
 		copyWithTemplate(
 			fromPath('_package.json'),
 			toPath('package.json'),
 			variables
 		),
-		copyWithTemplate(fromPath('readme.md'), toPath('readme.md'), variables),
+		copyWithTemplate(
+			fromPath('../_common/readme.md'),
+			toPath('readme.md'),
+			variables
+		),
 		cpy(
 			[
-				fromPath('.editorconfig'),
-				fromPath('.gitattributes'),
-				fromPath('.gitignore')
+				fromPath('../_common/.editorconfig'),
+				fromPath('../_common/.gitattributes'),
+				fromPath('../_common/.gitignore')
 			],
 			process.cwd()
 		)
@@ -52,14 +56,14 @@ const copyTasks = variables => {
 
 	return useTsx
 		? [
-				...baseCopies,
+				...commonCopies,
 				cpy(fromPath('source/ui.tsx'), toPath('source')),
 				cpy(fromPath('source/cli.tsx'), toPath('source')),
 				cpy(fromPath('source/test.tsx'), toPath('source')),
 				cpy(fromPath('tsconfig.json'), process.cwd())
 		  ]
 		: [
-				...baseCopies,
+				...commonCopies,
 				copyWithTemplate(fromPath('cli.js'), toPath('cli.js'), variables),
 				cpy(fromPath('ui.js'), process.cwd()),
 				cpy(fromPath('test.js'), process.cwd())
