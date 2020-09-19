@@ -19,7 +19,7 @@
 	"files": [
 		"index.js",
 		"cli.js",
-		"template"
+		"templates"
 	],
 	"keywords": [
 		"ink",
@@ -44,7 +44,7 @@
 	"xo": {
 		"prettier": true,
 		"ignores": [
-			"template"
+			"templates/**"
 		]
 	},
 	"prettier": "@vdemedes/prettier-config"

@@ -10,6 +10,8 @@ This helper tool scaffolds out basic project structure for Ink apps and lets you
 $ mkdir my-fancy-cli
 $ cd my-fancy-cli
 $ npx create-ink-app
+# Or create with TypeScript React
+$ npx create-ink-app --tsx
 ```
 
 ![](media/demo.gif)
