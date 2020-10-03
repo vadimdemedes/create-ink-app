@@ -22,10 +22,10 @@ const copyWithTemplate = async (from, to, variables) => {
 	await writeFile(to, generatedSource);
 };
 
-const useTypeScript = process.argv.includes('--tsx');
+const useTypeScript = process.argv.includes('--typescript');
 let templatePath = 'templates/js';
 
-if (useTsx) {
+if (useTypeScript) {
 	templatePath = 'templates/ts';
 }
 
@@ -54,25 +54,25 @@ const copyTasks = variables => {
 		)
 	];
 
-	return useTsx
+	return useTypeScript
 		? [
-				...commonCopies,
+				...commonTasks,
 				cpy(fromPath('source/ui.tsx'), toPath('source')),
 				cpy(fromPath('source/cli.tsx'), toPath('source')),
 				cpy(fromPath('source/test.tsx'), toPath('source')),
 				cpy(fromPath('tsconfig.json'), process.cwd())
 		  ]
 		: [
-				...commonCopies,
+				...commonTasks,
 				copyWithTemplate(fromPath('cli.js'), toPath('cli.js'), variables),
 				cpy(fromPath('ui.js'), process.cwd()),
 				cpy(fromPath('test.js'), process.cwd())
 		  ];
 };
 
-const dependencies = useTsx ? [''] : ['import-jsx'];
+const dependencies = useTypeScript ? [''] : ['import-jsx'];
 
-const devDependencies = useTsx
+const devDependencies = useTypeScript
 	? ['@ava/typescript', '@sindresorhus/tsconfig', '@types/react', 'typescript']
 	: [
 			'@ava/babel',
@@ -123,7 +123,7 @@ module.exports = () => {
 		{
 			title: 'Link executable',
 			task: async () => {
-				if (useTsx) {
+				if (useTypeScript) {
 					await execa('npm', ['run', 'build']);
 				}
 

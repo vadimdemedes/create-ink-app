@@ -11,7 +11,7 @@ $ mkdir my-fancy-cli
 $ cd my-fancy-cli
 $ npx create-ink-app
 # Or create with TypeScript React
-$ npx create-ink-app --tsx
+$ npx create-ink-app --typescript
 ```
 
 ![](media/demo.gif)
