@@ -22,7 +22,7 @@ const copyWithTemplate = async (from, to, variables) => {
 	await writeFile(to, generatedSource);
 };
 
-const useTsx = process.argv.includes('--tsx');
+const useTypeScript = process.argv.includes('--tsx');
 let templatePath = 'templates/js';
 
 if (useTsx) {
