@@ -5,7 +5,7 @@ const createInkApp = require('.');
 
 meow(`
 	Options
-		--tsx		Use TypeScript React template
+		--typescript		Use TypeScript React template
 
 	Usage
 		$ mkdir my-cli
