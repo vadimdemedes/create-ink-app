@@ -33,7 +33,7 @@ const fromPath = file => path.join(__dirname, templatePath, file);
 const toPath = file => path.join(process.cwd(), file);
 
 const copyTasks = variables => {
-	const commonCopies = [
+	const commonTasks = [
 		copyWithTemplate(
 			fromPath('_package.json'),
 			toPath('package.json'),
