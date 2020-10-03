@@ -2,6 +2,7 @@
 const {promisify} = require('util');
 const path = require('path');
 const fs = require('fs');
+const makeDir = require('make-dir');
 const replaceString = require('replace-string');
 const slugify = require('slugify');
 const execa = require('execa');
@@ -12,6 +13,9 @@ const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 
 const copyWithTemplate = async (from, to, variables) => {
+	const dirname = path.dirname(to);
+	await makeDir(dirname);
+
 	const source = await readFile(from, 'utf8');
 	let generatedSource = source;
 
@@ -58,7 +62,11 @@ const copyTasks = variables => {
 		? [
 				...commonTasks,
 				cpy(fromPath('source/ui.tsx'), toPath('source')),
-				cpy(fromPath('source/cli.tsx'), toPath('source')),
+				copyWithTemplate(
+					fromPath('source/cli.tsx'),
+					toPath('source/cli.tsx'),
+					variables
+				),
 				cpy(fromPath('source/test.tsx'), toPath('source')),
 				cpy(fromPath('tsconfig.json'), process.cwd())
 		  ]
