@@ -26,7 +26,7 @@ const useTsx = process.argv.includes('--tsx');
 let templatePath = 'templates/js';
 
 if (useTsx) {
-	templatePath = 'templates/tsx';
+	templatePath = 'templates/ts';
 }
 
 const fromPath = file => path.join(__dirname, templatePath, file);
