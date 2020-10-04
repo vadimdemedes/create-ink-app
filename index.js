@@ -2,6 +2,7 @@
 const {promisify} = require('util');
 const path = require('path');
 const fs = require('fs');
+const makeDir = require('make-dir');
 const replaceString = require('replace-string');
 const slugify = require('slugify');
 const execa = require('execa');
@@ -12,6 +13,9 @@ const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 
 const copyWithTemplate = async (from, to, variables) => {
+	const dirname = path.dirname(to);
+	await makeDir(dirname);
+
 	const source = await readFile(from, 'utf8');
 	let generatedSource = source;
 
@@ -22,8 +26,68 @@ const copyWithTemplate = async (from, to, variables) => {
 	await writeFile(to, generatedSource);
 };
 
-const fromPath = file => path.join(__dirname, 'template', file);
+const useTypeScript = process.argv.includes('--typescript');
+let templatePath = 'templates/js';
+
+if (useTypeScript) {
+	templatePath = 'templates/ts';
+}
+
+const fromPath = file => path.join(__dirname, templatePath, file);
 const toPath = file => path.join(process.cwd(), file);
+
+const copyTasks = variables => {
+	const commonTasks = [
+		copyWithTemplate(
+			fromPath('_package.json'),
+			toPath('package.json'),
+			variables
+		),
+		copyWithTemplate(
+			fromPath('../_common/readme.md'),
+			toPath('readme.md'),
+			variables
+		),
+		cpy(
+			[
+				fromPath('../_common/.editorconfig'),
+				fromPath('../_common/.gitattributes'),
+				fromPath('../_common/.gitignore')
+			],
+			process.cwd()
+		)
+	];
+
+	return useTypeScript
+		? [
+				...commonTasks,
+				cpy(fromPath('source/ui.tsx'), toPath('source')),
+				copyWithTemplate(
+					fromPath('source/cli.tsx'),
+					toPath('source/cli.tsx'),
+					variables
+				),
+				cpy(fromPath('source/test.tsx'), toPath('source')),
+				cpy(fromPath('tsconfig.json'), process.cwd())
+		  ]
+		: [
+				...commonTasks,
+				copyWithTemplate(fromPath('cli.js'), toPath('cli.js'), variables),
+				cpy(fromPath('ui.js'), process.cwd()),
+				cpy(fromPath('test.js'), process.cwd())
+		  ];
+};
+
+const dependencies = useTypeScript ? [''] : ['import-jsx'];
+
+const devDependencies = useTypeScript
+	? ['@ava/typescript', '@sindresorhus/tsconfig', '@types/react', 'typescript']
+	: [
+			'@ava/babel',
+			'@babel/preset-env',
+			'@babel/preset-react',
+			'@babel/register'
+	  ];
 
 module.exports = () => {
 	const pkgName = slugify(path.basename(process.cwd()));
@@ -36,56 +100,43 @@ module.exports = () => {
 					name: pkgName
 				};
 
-				return Promise.all([
-					copyWithTemplate(
-						fromPath('_package.json'),
-						toPath('package.json'),
-						variables
-					),
-					copyWithTemplate(
-						fromPath('readme.md'),
-						toPath('readme.md'),
-						variables
-					),
-					copyWithTemplate(fromPath('cli.js'), toPath('cli.js'), variables),
-					cpy(fromPath('ui.js'), process.cwd()),
-					cpy(fromPath('test.js'), process.cwd()),
-					cpy(
-						[
-							fromPath('.editorconfig'),
-							fromPath('.gitattributes'),
-							fromPath('.gitignore')
-						],
-						process.cwd()
-					)
-				]);
+				return Promise.all(copyTasks(variables));
 			}
 		},
 		{
 			title: 'Install dependencies',
 			task: async () => {
-				await execa('npm', ['install', 'meow', 'ink', 'react', 'import-jsx']);
+				await execa('npm', [
+					'install',
+					'meow',
+					'ink',
+					'react',
+					...dependencies
+				]);
 
 				return execa('npm', [
 					'install',
 					'--save-dev',
 					'xo',
 					'ava',
-					'@ava/babel',
 					'ink-testing-library',
 					'chalk',
-					'@babel/preset-env',
-					'@babel/preset-react',
-					'@babel/register',
 					'eslint-config-xo-react',
 					'eslint-plugin-react',
-					'eslint-plugin-react-hooks'
+					'eslint-plugin-react-hooks',
+					...devDependencies
 				]);
 			}
 		},
 		{
 			title: 'Link executable',
-			task: () => execa('npm', ['link'])
+			task: async () => {
+				if (useTypeScript) {
+					await execa('npm', ['run', 'build']);
+				}
+
+				return execa('npm', ['link']);
+			}
 		}
 	]);
 
