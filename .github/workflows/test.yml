@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node_version: [10, 12]
+        node_version: [10, 12, 14]
 
     steps:
       - uses: actions/checkout@master
@@ -15,5 +15,22 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node_version }}
-      - run: npm install
-      - run: npm test
+
+      - name: Setup
+        run: |
+          npm install
+          npm test
+          npm link
+          mkdir ../js-app && mkdir ../ts-app
+
+      - name: Test create-ink-app with JavaScript
+        working-directory: ../js-app
+        run: |
+          create-ink-app
+          npm test
+
+      - name: Test create-ink-app with TypeScript
+        working-directory: ../ts-app
+        run: |
+          create-ink-app --typescript
+          npm test
