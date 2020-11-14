@@ -130,12 +130,10 @@ module.exports = () => {
 		},
 		{
 			title: 'Link executable',
-			task: async () => {
+			task: () => {
 				if (useTypeScript) {
-					await execa('npm', ['run', 'build']);
+					return execa('npm', ['run', 'build']);
 				}
-
-				return execa('npm', ['link']);
 			}
 		}
 	]);
