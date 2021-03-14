@@ -34,18 +34,18 @@ if (useTypeScript) {
 }
 
 const fromPath = file => path.join(__dirname, templatePath, file);
-const toPath = file => path.join(process.cwd(), file);
+const toPath = (rootPath, file) => path.join(rootPath, file);
 
-const copyTasks = variables => {
+const copyTasks = (projectDirectoryPath, variables) => {
 	const commonTasks = [
 		copyWithTemplate(
 			fromPath('_package.json'),
-			toPath('package.json'),
+			toPath(projectDirectoryPath, 'package.json'),
 			variables
 		),
 		copyWithTemplate(
 			fromPath('../_common/readme.md'),
-			toPath('readme.md'),
+			toPath(projectDirectoryPath, 'readme.md'),
 			variables
 		),
 		cpy(
@@ -54,27 +54,34 @@ const copyTasks = variables => {
 				fromPath('../_common/.gitattributes'),
 				fromPath('../_common/.gitignore')
 			],
-			process.cwd()
+			projectDirectoryPath
 		)
 	];
 
 	return useTypeScript
 		? [
 				...commonTasks,
-				cpy(fromPath('source/ui.tsx'), toPath('source')),
+				cpy(fromPath('source/ui.tsx'), toPath(projectDirectoryPath, 'source')),
 				copyWithTemplate(
 					fromPath('source/cli.tsx'),
-					toPath('source/cli.tsx'),
+					toPath(projectDirectoryPath, 'source/cli.tsx'),
 					variables
 				),
-				cpy(fromPath('source/test.tsx'), toPath('source')),
-				cpy(fromPath('tsconfig.json'), process.cwd())
+				cpy(
+					fromPath('source/test.tsx'),
+					toPath(projectDirectoryPath, 'source')
+				),
+				cpy(fromPath('tsconfig.json'), projectDirectoryPath)
 		  ]
 		: [
 				...commonTasks,
-				copyWithTemplate(fromPath('cli.js'), toPath('cli.js'), variables),
-				cpy(fromPath('ui.js'), process.cwd()),
-				cpy(fromPath('test.js'), process.cwd())
+				copyWithTemplate(
+					fromPath('cli.js'),
+					toPath(projectDirectoryPath, 'cli.js'),
+					variables
+				),
+				cpy(fromPath('ui.js'), projectDirectoryPath),
+				cpy(fromPath('test.js'), projectDirectoryPath)
 		  ];
 };
 
@@ -89,8 +96,13 @@ const devDependencies = useTypeScript
 			'@babel/register'
 	  ];
 
-module.exports = () => {
-	const pkgName = slugify(path.basename(process.cwd()));
+module.exports = (projectDirectoryPath = process.cwd()) => {
+	const pkgName = slugify(path.basename(projectDirectoryPath));
+	const execaInDirectory = (file, args, options = {}) =>
+		execa(file, args, {
+			...options,
+			cwd: projectDirectoryPath
+		});
 
 	const tasks = new Listr([
 		{
@@ -100,13 +112,13 @@ module.exports = () => {
 					name: pkgName
 				};
 
-				return Promise.all(copyTasks(variables));
+				return Promise.all(copyTasks(projectDirectoryPath, variables));
 			}
 		},
 		{
 			title: 'Install dependencies',
 			task: async () => {
-				await execa('npm', [
+				await execaInDirectory('npm', [
 					'install',
 					'meow',
 					'ink',
@@ -114,7 +126,7 @@ module.exports = () => {
 					...dependencies
 				]);
 
-				return execa('npm', [
+				return execaInDirectory('npm', [
 					'install',
 					'--save-dev',
 					'xo',
@@ -132,10 +144,10 @@ module.exports = () => {
 			title: 'Link executable',
 			task: async () => {
 				if (useTypeScript) {
-					await execa('npm', ['run', 'build']);
+					await execaInDirectory('npm', ['run', 'build']);
 				}
 
-				return execa('npm', ['link']);
+				return execaInDirectory('npm', ['link']);
 			}
 		}
 	]);
