@@ -130,12 +130,17 @@ module.exports = () => {
 		},
 		{
 			title: 'Link executable',
-			task: async () => {
+			task: async (_, task) => {
 				if (useTypeScript) {
 					await execa('npm', ['run', 'build']);
 				}
 
-				return execa('npm', ['link']);
+				try {
+					await execa('npm', ['link']);
+					// eslint-disable-next-line unicorn/prefer-optional-catch-binding
+				} catch (_) {
+					task.skip('npm link failed, please try running with sudo');
+				}
 			}
 		}
 	]);
