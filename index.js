@@ -117,7 +117,7 @@ module.exports = () => {
 				return execa('npm', [
 					'install',
 					'--save-dev',
-					'xo',
+					'xo@0.39.1',
 					'ava',
 					'ink-testing-library',
 					'chalk@4',
