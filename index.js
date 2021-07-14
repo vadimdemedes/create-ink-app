@@ -108,8 +108,8 @@ module.exports = () => {
 			task: async () => {
 				await execa('npm', [
 					'install',
-					'meow',
-					'ink',
+					'meow@9',
+					'ink@3',
 					'react',
 					...dependencies
 				]);
@@ -117,10 +117,10 @@ module.exports = () => {
 				return execa('npm', [
 					'install',
 					'--save-dev',
-					'xo',
+					'xo@0.39.1',
 					'ava',
 					'ink-testing-library',
-					'chalk',
+					'chalk@4',
 					'eslint-config-xo-react',
 					'eslint-plugin-react',
 					'eslint-plugin-react-hooks',
