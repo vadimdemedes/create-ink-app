@@ -14,7 +14,7 @@
 		"node": ">=8"
 	},
 	"scripts": {
-		"ci": "xo"
+		"lint": "xo"
 	},
 	"files": [
 		"index.js",
