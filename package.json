@@ -7,14 +7,14 @@
 	"author": {
 		"name": "Vadim Demedes",
 		"email": "vdemedes@gmail.com",
-		"url": "vadimdemedes.com"
+		"url": "https://vadimdemedes.com"
 	},
 	"bin": "cli.js",
 	"engines": {
 		"node": ">=8"
 	},
 	"scripts": {
-		"test": "xo"
+		"ci": "xo"
 	},
 	"files": [
 		"index.js",

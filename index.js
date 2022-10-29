@@ -81,7 +81,7 @@ const copyTasks = variables => {
 const dependencies = useTypeScript ? [''] : ['import-jsx'];
 
 const devDependencies = useTypeScript
-	? ['@ava/typescript', '@sindresorhus/tsconfig', '@types/react', 'typescript']
+	? ['@ava/typescript', '@sindresorhus/tsconfig', '@types/react', 'typescript', '@types/node']
 	: [
 			'@ava/babel',
 			'@babel/preset-env',
