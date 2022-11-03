@@ -8,6 +8,7 @@ const slugify = require('slugify');
 const execa = require('execa');
 const Listr = require('listr');
 const cpy = require('cpy');
+const prompts = require('prompts');
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -25,6 +26,22 @@ const copyWithTemplate = async (from, to, variables) => {
 
 	await writeFile(to, generatedSource);
 };
+
+/** @return {Promise<'npm' | 'yarn' | 'pnpm'>} */ // eslint-disable-line valid-jsdoc
+async function getPackageManagerToUse() {
+	return (
+		await prompts({
+			name: 'packageManager',
+			message: 'Which package manager do you use to install dependencies?',
+			type: 'select',
+			choices: [
+				{title: 'npm', value: 'npm'},
+				{title: 'yarn', value: 'yarn'},
+				{title: 'pnpm', value: 'pnpm'}
+			]
+		})
+	).packageManager;
+}
 
 const useTypeScript = process.argv.includes('--typescript');
 let templatePath = 'templates/js';
@@ -81,7 +98,13 @@ const copyTasks = variables => {
 const dependencies = useTypeScript ? [''] : ['import-jsx'];
 
 const devDependencies = useTypeScript
-	? ['@ava/typescript', '@sindresorhus/tsconfig', '@types/react', 'typescript', '@types/node']
+	? [
+			'@ava/typescript',
+			'@sindresorhus/tsconfig',
+			'@types/react',
+			'typescript',
+			'@types/node'
+	  ]
 	: [
 			'@ava/babel',
 			'@babel/preset-env',
@@ -89,7 +112,16 @@ const devDependencies = useTypeScript
 			'@babel/register'
 	  ];
 
-module.exports = () => {
+/** @returns {Promise<Promise<any>>} */ // eslint-disable-line valid-jsdoc
+
+module.exports = async () => {
+	/** @type {'npm' | 'yarn' | 'pnpm'} */
+	const pm = await getPackageManagerToUse();
+
+	console.log(pm);
+
+	// eslint-disable-next-line no-return-assign
+
 	const pkgName = slugify(path.basename(process.cwd()));
 
 	const tasks = new Listr([
@@ -105,17 +137,21 @@ module.exports = () => {
 		},
 		{
 			title: 'Install dependencies',
-			task: async () => {
-				await execa('npm', [
-					'install',
+			task: () => {
+				return execa.stdout(pm, [
+					pm === 'pnpm' ? 'add' : 'install',
 					'meow@9',
 					'ink@3',
 					'react',
 					...dependencies
 				]);
-
-				return execa('npm', [
-					'install',
+			}
+		},
+		{
+			title: 'Install dev dependencies',
+			task: () => {
+				return execa.stdout(pm, [
+					pm === 'pnpm' ? 'add' : 'install',
 					'--save-dev',
 					'xo@0.39.1',
 					'ava',
@@ -132,14 +168,18 @@ module.exports = () => {
 			title: 'Link executable',
 			task: async (_, task) => {
 				if (useTypeScript) {
-					await execa('npm', ['run', 'build']);
+					await execa(pm, ['run', 'build']);
 				}
 
 				try {
-					await execa('npm', ['link']);
+					await execa(pm, ['link']);
 					// eslint-disable-next-line unicorn/prefer-optional-catch-binding
 				} catch (_) {
-					task.skip('npm link failed, please try running with sudo');
+					task.skip(
+						`${pm} link${
+							pm === 'pnpm' ? ' --global' : ''
+						} failed, please try running with sudo or running it manually.`
+					);
 				}
 			}
 		}
