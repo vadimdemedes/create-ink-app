@@ -10,7 +10,8 @@
 		"build": "tsc && chmod +x dist/cli.js",
 		"start": "npm run build && dist/cli.js",
 		"pretest": "npm run build",
-		"test": "xo && ava"
+		"test": "ava",
+		"lint": "xo"
 	},
 	"files": [
 		"dist/cli.js"
