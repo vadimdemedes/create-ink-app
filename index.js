@@ -6,7 +6,7 @@ const makeDir = require('make-dir');
 const replaceString = require('replace-string');
 const slugify = require('slugify');
 const execa = require('execa');
-const Listr = require('listr');
+const {Listr} = require('listr2');
 const cpy = require('cpy');
 const prompts = require('prompts');
 
@@ -138,19 +138,20 @@ module.exports = async () => {
 		{
 			title: 'Install dependencies',
 			task: () => {
-				return execa.stdout(pm, [
+				return execa(pm, [
 					pm === 'pnpm' ? 'add' : 'install',
 					'meow@9',
 					'ink@3',
 					'react',
 					...dependencies
-				]);
-			}
+				]).stdout;
+			},
+			options: {showTimer: true}
 		},
 		{
 			title: 'Install dev dependencies',
 			task: () => {
-				return execa.stdout(pm, [
+				return execa(pm, [
 					pm === 'pnpm' ? 'add' : 'install',
 					'--save-dev',
 					'xo@0.39.1',
@@ -161,18 +162,24 @@ module.exports = async () => {
 					'eslint-plugin-react',
 					'eslint-plugin-react-hooks',
 					...devDependencies
-				]);
-			}
+				]).stdout;
+			},
+			options: {showTimer: true}
 		},
 		{
 			title: 'Link executable',
+			skip: () => {
+				if (pm === 'yarn') {
+					return 'Yarn currently has no way of linking an executable globally to test your CLI (as if it was installed on your machine).';
+				}
+			},
 			task: async (_, task) => {
 				if (useTypeScript) {
 					await execa(pm, ['run', 'build']);
 				}
 
 				try {
-					await execa(pm, ['link']);
+					await execa(pm, pm === 'pnpm' ? ['link', '--global'] : ['link']);
 					// eslint-disable-next-line unicorn/prefer-optional-catch-binding
 				} catch (_) {
 					task.skip(
