@@ -10,6 +10,14 @@ const {Listr} = require('listr2');
 const cpy = require('cpy');
 const prompts = require('prompts');
 
+const {typescript: useTypeScript, packageManager: selectedPm} =
+	require('./parse')();
+
+prompts.override({
+	useTypeScript,
+	packageManager: selectedPm
+});
+
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 
@@ -43,7 +51,6 @@ async function getPackageManagerToUse() {
 	).packageManager;
 }
 
-const useTypeScript = process.argv.includes('--typescript');
 let templatePath = 'templates/js';
 
 if (useTypeScript) {
@@ -118,8 +125,6 @@ module.exports = async () => {
 	/** @type {'npm' | 'yarn' | 'pnpm'} */
 	const pm = await getPackageManagerToUse();
 
-	console.log(pm);
-
 	// eslint-disable-next-line no-return-assign
 
 	const pkgName = slugify(path.basename(process.cwd()));
@@ -137,21 +142,20 @@ module.exports = async () => {
 		},
 		{
 			title: 'Install dependencies',
-			task: () => {
-				return execa(pm, [
+			task: () =>
+				execa(pm, [
 					pm === 'pnpm' ? 'add' : 'install',
 					'meow@9',
 					'ink@3',
 					'react',
 					...dependencies
-				]).stdout;
-			},
+				]).stdout,
 			options: {showTimer: true}
 		},
 		{
 			title: 'Install dev dependencies',
-			task: () => {
-				return execa(pm, [
+			task: () =>
+				execa(pm, [
 					pm === 'pnpm' ? 'add' : 'install',
 					'--save-dev',
 					'xo@0.39.1',
@@ -162,8 +166,7 @@ module.exports = async () => {
 					'eslint-plugin-react',
 					'eslint-plugin-react-hooks',
 					...devDependencies
-				]).stdout;
-			},
+				]).stdout,
 			options: {showTimer: true}
 		},
 		{
