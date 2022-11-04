@@ -10,10 +10,8 @@ const {Listr} = require('listr2');
 const cpy = require('cpy');
 const prompts = require('prompts');
 
-const {
-	typescript: useTypeScript,
-	packageManager: selectedPm
-} = require('./parse')();
+const {typescript: useTypeScript, packageManager: selectedPm} =
+	require('./parse')();
 
 prompts.override({
 	useTypeScript,
