@@ -15,3 +15,8 @@ $ npx create-ink-app --typescript
 ```
 
 ![](media/demo.gif)
+
+## Notes when contributing
+
+**Use npm to install dependencies of create-ink-app**.
+Installing with [pnpm](https://pnpm.io) or [Yarn](https://yarnpkg.com/) may create issues with linting, etc.
