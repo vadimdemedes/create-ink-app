@@ -10,8 +10,10 @@ const {Listr} = require('listr2');
 const cpy = require('cpy');
 const prompts = require('prompts');
 
-const {typescript: useTypeScript, packageManager: selectedPm} =
-	require('./parse')();
+const {
+	typescript: useTypeScript,
+	packageManager: selectedPm
+} = require('./parse')();
 
 prompts.override({
 	useTypeScript,
@@ -33,10 +35,9 @@ const copyWithTemplate = async (from, to, variables) => {
 	}
 
 	await writeFile(to, generatedSource);
-};
+}; // eslint-disable-line valid-jsdoc
 
-/** @return {Promise<'npm' | 'yarn' | 'pnpm'>} */ // eslint-disable-line valid-jsdoc
-async function getPackageManagerToUse() {
+/** @return {Promise<'npm' | 'yarn' | 'pnpm'>} */ async function getPackageManagerToUse() {
 	return (
 		await prompts({
 			name: 'packageManager',
@@ -117,11 +118,9 @@ const devDependencies = useTypeScript
 			'@babel/preset-env',
 			'@babel/preset-react',
 			'@babel/register'
-	  ];
+	  ]; // eslint-disable-line valid-jsdoc
 
-/** @returns {Promise<Promise<any>>} */ // eslint-disable-line valid-jsdoc
-
-module.exports = async () => {
+/** @returns {Promise<Promise<any>>} */ module.exports = async () => {
 	/** @type {'npm' | 'yarn' | 'pnpm'} */
 	const pm = await getPackageManagerToUse();
 
