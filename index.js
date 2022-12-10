@@ -38,8 +38,22 @@ const copyWithTemplate = async (from, to, variables) => {
 // eslint-disable-next-line valid-jsdoc
 /** @return {Promise<'npm' | 'yarn' | 'pnpm'>} */
 async function getPackageManagerToUse() {
-	const [{exitCode: yarnVersionExitCode}, {exitCode: pnpmVersionExitCode}] =
-		await Promise.all([execa('yarn', ['-v']), execa('pnpm', ['-v'])]);
+	let isYarnAvailable;
+	let isPnpmAvailable;
+
+	try {
+		await execa('yarn', ['-v']);
+		isYarnAvailable = true;
+	} catch (error) {
+		isYarnAvailable = false;
+	}
+
+	try {
+		await execa('pnpm', ['-v']);
+		isPnpmAvailable = true;
+	} catch (error) {
+		isPnpmAvailable = false;
+	}
 
 	return (
 		await prompts({
@@ -49,14 +63,14 @@ async function getPackageManagerToUse() {
 			choices: [
 				{title: 'npm', value: 'npm'},
 				{
-					title: 'yarn' + yarnVersionExitCode === 0 ? '' : ' (unavailable)',
+					title: 'yarn' + isYarnAvailable ? '' : ' (unavailable)',
 					value: 'yarn',
-					disabled: yarnVersionExitCode !== 0
+					disabled: !isYarnAvailable
 				},
 				{
-					title: 'pnpm' + pnpmVersionExitCode === 0 ? '' : ' (unavailable)',
+					title: 'pnpm' + isPnpmAvailable ? '' : ' (unavailable)',
 					value: 'pnpm',
-					disabled: pnpmVersionExitCode !== 0
+					disabled: !isPnpmAvailable
 				}
 			]
 		})
@@ -125,34 +139,28 @@ const devDependencies = useTypeScript
 			'@babel/preset-env',
 			'@babel/preset-react',
 			'@babel/register'
-	  ]; // eslint-disable-line valid-jsdoc
+	  ];
 
+// eslint-disable-next-line valid-jsdoc
 /** @returns {Promise<Promise<any>>} */ module.exports = async () => {
 	/** @type {'npm' | 'yarn' | 'pnpm'} */
 	const pm = await getPackageManagerToUse();
 
 	if (!pm) return;
 
-	// eslint-disable-next-line no-return-assign
-
 	const pkgName = slugify(path.basename(process.cwd()));
 
+	const pmInstallCommand = pm === 'npm' ? 'install' : 'add';
 	const tasks = new Listr([
 		{
 			title: 'Copy files',
-			task: async () => {
-				const variables = {
-					name: pkgName
-				};
-
-				return Promise.all(copyTasks(variables));
-			}
+			task: () => Promise.all(copyTasks({name: pkgName}))
 		},
 		{
 			title: 'Install dependencies',
 			task: () =>
 				execa(pm, [
-					pm === 'pnpm' ? 'add' : 'install',
+					pmInstallCommand,
 					'meow@9',
 					'ink@3',
 					'react',
@@ -164,7 +172,7 @@ const devDependencies = useTypeScript
 			title: 'Install dev dependencies',
 			task: () =>
 				execa(pm, [
-					pm === 'pnpm' ? 'add' : 'install',
+					pmInstallCommand,
 					'--save-dev',
 					'xo@0.39.1',
 					'ava',
