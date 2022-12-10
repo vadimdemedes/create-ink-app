@@ -33,9 +33,14 @@ const copyWithTemplate = async (from, to, variables) => {
 	}
 
 	await writeFile(to, generatedSource);
-}; // eslint-disable-line valid-jsdoc
+};
 
-/** @return {Promise<'npm' | 'yarn' | 'pnpm'>} */ async function getPackageManagerToUse() {
+// eslint-disable-next-line valid-jsdoc
+/** @return {Promise<'npm' | 'yarn' | 'pnpm'>} */
+async function getPackageManagerToUse() {
+	const [{exitCode: yarnVersionExitCode}, {exitCode: pnpmVersionExitCode}] =
+		await Promise.all([execa('yarn', ['-v']), execa('pnpm', ['-v'])]);
+
 	return (
 		await prompts({
 			name: 'packageManager',
@@ -43,18 +48,22 @@ const copyWithTemplate = async (from, to, variables) => {
 			type: 'select',
 			choices: [
 				{title: 'npm', value: 'npm'},
-				{title: 'yarn', value: 'yarn'},
-				{title: 'pnpm', value: 'pnpm'}
+				{
+					title: 'yarn' + yarnVersionExitCode === 0 ? '' : ' (unavailable)',
+					value: 'yarn',
+					disabled: yarnVersionExitCode !== 0
+				},
+				{
+					title: 'pnpm' + pnpmVersionExitCode === 0 ? '' : ' (unavailable)',
+					value: 'pnpm',
+					disabled: pnpmVersionExitCode !== 0
+				}
 			]
 		})
 	).packageManager;
 }
 
-let templatePath = 'templates/js';
-
-if (useTypeScript) {
-	templatePath = 'templates/ts';
-}
+const templatePath = `templates/${useTypeScript ? 'ts' : 'js'}`;
 
 const fromPath = file => path.join(__dirname, templatePath, file);
 const toPath = file => path.join(process.cwd(), file);
@@ -121,6 +130,8 @@ const devDependencies = useTypeScript
 /** @returns {Promise<Promise<any>>} */ module.exports = async () => {
 	/** @type {'npm' | 'yarn' | 'pnpm'} */
 	const pm = await getPackageManagerToUse();
+
+	if (!pm) return;
 
 	// eslint-disable-next-line no-return-assign
 
