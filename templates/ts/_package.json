@@ -7,7 +7,7 @@
 		"node": ">=10"
 	},
 	"scripts": {
-		"build": "tsc",
+		"build": "tsc && chmod +x dist/cli.js",
 		"start": "npm run build && dist/cli.js",
 		"pretest": "npm run build",
 		"test": "xo && ava"

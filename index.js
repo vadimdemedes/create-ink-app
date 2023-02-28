@@ -120,8 +120,8 @@ module.exports = (projectDirectoryPath = process.cwd()) => {
 			task: async () => {
 				await execaInDirectory('npm', [
 					'install',
-					'meow',
-					'ink',
+					'meow@9',
+					'ink@3',
 					'react',
 					...dependencies
 				]);
@@ -129,10 +129,10 @@ module.exports = (projectDirectoryPath = process.cwd()) => {
 				return execaInDirectory('npm', [
 					'install',
 					'--save-dev',
-					'xo',
+					'xo@0.39.1',
 					'ava',
 					'ink-testing-library',
-					'chalk',
+					'chalk@4',
 					'eslint-config-xo-react',
 					'eslint-plugin-react',
 					'eslint-plugin-react-hooks',
@@ -142,12 +142,17 @@ module.exports = (projectDirectoryPath = process.cwd()) => {
 		},
 		{
 			title: 'Link executable',
-			task: async () => {
+			task: async (_, task) => {
 				if (useTypeScript) {
 					await execaInDirectory('npm', ['run', 'build']);
 				}
 
-				return execaInDirectory('npm', ['link']);
+				try {
+					await execaInDirectory('npm', ['link']);
+					// eslint-disable-next-line unicorn/prefer-optional-catch-binding
+				} catch (_) {
+					task.skip('npm link failed, please try running with sudo');
+				}
 			}
 		}
 	]);
