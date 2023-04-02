@@ -1,13 +1,14 @@
-'use strict';
-const {promisify} = require('util');
-const path = require('path');
-const fs = require('fs');
-const makeDir = require('make-dir');
-const replaceString = require('replace-string');
-const slugify = require('slugify');
-const execa = require('execa');
-const Listr = require('listr');
-const cpy = require('cpy');
+import process from 'node:process';
+import {fileURLToPath} from 'node:url';
+import {promisify} from 'node:util';
+import path from 'node:path';
+import fs from 'node:fs';
+import makeDir from 'make-dir';
+import replaceString from 'replace-string';
+import slugify from 'slugify';
+import {execa} from 'execa';
+import Listr from 'listr';
+import cpy from 'cpy';
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -26,137 +27,141 @@ const copyWithTemplate = async (from, to, variables) => {
 	await writeFile(to, generatedSource);
 };
 
-const useTypeScript = process.argv.includes('--typescript');
-let templatePath = 'templates/js';
-
-if (useTypeScript) {
-	templatePath = 'templates/ts';
-}
-
-const fromPath = file => path.join(__dirname, templatePath, file);
-const toPath = (rootPath, file) => path.join(rootPath, file);
-
-const copyTasks = (projectDirectoryPath, variables) => {
-	const commonTasks = [
-		copyWithTemplate(
-			fromPath('_package.json'),
-			toPath(projectDirectoryPath, 'package.json'),
-			variables
-		),
-		copyWithTemplate(
-			fromPath('../_common/readme.md'),
-			toPath(projectDirectoryPath, 'readme.md'),
-			variables
-		),
-		cpy(
-			[
-				fromPath('../_common/.editorconfig'),
-				fromPath('../_common/.gitattributes'),
-				fromPath('../_common/.gitignore')
-			],
-			projectDirectoryPath
-		)
-	];
-
-	return useTypeScript
-		? [
-				...commonTasks,
-				cpy(fromPath('source/ui.tsx'), toPath(projectDirectoryPath, 'source')),
-				copyWithTemplate(
-					fromPath('source/cli.tsx'),
-					toPath(projectDirectoryPath, 'source/cli.tsx'),
-					variables
-				),
-				cpy(
-					fromPath('source/test.tsx'),
-					toPath(projectDirectoryPath, 'source')
-				),
-				cpy(fromPath('tsconfig.json'), projectDirectoryPath)
-		  ]
-		: [
-				...commonTasks,
-				copyWithTemplate(
-					fromPath('cli.js'),
-					toPath(projectDirectoryPath, 'cli.js'),
-					variables
-				),
-				cpy(fromPath('ui.js'), projectDirectoryPath),
-				cpy(fromPath('test.js'), projectDirectoryPath)
-		  ];
-};
-
-const dependencies = useTypeScript ? [''] : ['import-jsx'];
-
-const devDependencies = useTypeScript
-	? ['@ava/typescript', '@sindresorhus/tsconfig', '@types/react', 'typescript']
-	: [
-			'@ava/babel',
-			'@babel/preset-env',
-			'@babel/preset-react',
-			'@babel/register'
-	  ];
-
-module.exports = (projectDirectoryPath = process.cwd()) => {
+const createInkApp = (
+	projectDirectoryPath = process.cwd(),
+	{typescript, silent},
+) => {
 	const pkgName = slugify(path.basename(projectDirectoryPath));
+
 	const execaInDirectory = (file, args, options = {}) =>
 		execa(file, args, {
 			...options,
-			cwd: projectDirectoryPath
+			cwd: projectDirectoryPath,
 		});
 
-	const tasks = new Listr([
-		{
-			title: 'Copy files',
-			task: async () => {
-				const variables = {
-					name: pkgName
-				};
+	const __dirname = path.dirname(fileURLToPath(import.meta.url));
+	const templatePath = typescript ? 'templates/ts' : 'templates/js';
 
-				return Promise.all(copyTasks(projectDirectoryPath, variables));
-			}
+	const fromPath = file =>
+		path.join(path.resolve(__dirname, templatePath), file);
+
+	const toPath = (rootPath, file) => path.join(rootPath, file);
+
+	const tasks = new Listr(
+		[
+			{
+				title: 'Copy files',
+				task() {
+					const variables = {
+						name: pkgName,
+					};
+
+					return new Listr([
+						{
+							title: 'Common files',
+							async task() {
+								return Promise.all([
+									copyWithTemplate(
+										fromPath('_package.json'),
+										toPath(projectDirectoryPath, 'package.json'),
+										variables,
+									),
+									copyWithTemplate(
+										fromPath('../_common/readme.md'),
+										toPath(projectDirectoryPath, 'readme.md'),
+										variables,
+									),
+									cpy(
+										[
+											fromPath('../_common/.editorconfig'),
+											fromPath('../_common/.gitattributes'),
+											fromPath('../_common/.gitignore'),
+											fromPath('../_common/.prettierignore'),
+										],
+										projectDirectoryPath,
+										{flat: true},
+									),
+								]);
+							},
+						},
+						{
+							title: 'JavaScript files',
+							enabled: () => !typescript,
+							async task() {
+								return Promise.all([
+									cpy(
+										fromPath('source/app.js'),
+										toPath(projectDirectoryPath, 'source'),
+									),
+									copyWithTemplate(
+										fromPath('source/cli.js'),
+										toPath(projectDirectoryPath, 'source/cli.js'),
+										variables,
+									),
+									cpy(fromPath('test.js'), projectDirectoryPath, {flat: true}),
+								]);
+							},
+						},
+						{
+							title: 'TypeScript files',
+							enabled: () => typescript,
+							async task() {
+								return Promise.all([
+									cpy(
+										fromPath('source/app.tsx'),
+										toPath(projectDirectoryPath, 'source'),
+									),
+									copyWithTemplate(
+										fromPath('source/cli.tsx'),
+										toPath(projectDirectoryPath, 'source/cli.tsx'),
+										variables,
+									),
+									cpy(
+										[fromPath('test.tsx'), fromPath('tsconfig.json')],
+										projectDirectoryPath,
+										{flat: true},
+									),
+								]);
+							},
+						},
+					]);
+				},
+			},
+			{
+				title: 'Install dependencies',
+				async task() {
+					await execaInDirectory('npm', ['install']);
+				},
+			},
+			{
+				title: 'Format code',
+				task() {
+					return execaInDirectory('npx', ['prettier', '--write', '.']);
+				},
+			},
+			{
+				title: 'Build',
+				task() {
+					return execaInDirectory('npm', ['run', 'build']);
+				},
+			},
+			{
+				title: 'Link executable',
+				async task(_, task) {
+					try {
+						await execaInDirectory('npm', ['link']);
+					} catch {
+						task.skip('`npm link` failed, try running it yourself');
+					}
+				},
+			},
+		],
+		{
+			renderer: silent ? 'silent' : 'default',
 		},
-		{
-			title: 'Install dependencies',
-			task: async () => {
-				await execaInDirectory('npm', [
-					'install',
-					'meow@9',
-					'ink@3',
-					'react',
-					...dependencies
-				]);
+	);
 
-				return execaInDirectory('npm', [
-					'install',
-					'--save-dev',
-					'xo@0.39.1',
-					'ava',
-					'ink-testing-library',
-					'chalk@4',
-					'eslint-config-xo-react',
-					'eslint-plugin-react',
-					'eslint-plugin-react-hooks',
-					...devDependencies
-				]);
-			}
-		},
-		{
-			title: 'Link executable',
-			task: async (_, task) => {
-				if (useTypeScript) {
-					await execaInDirectory('npm', ['run', 'build']);
-				}
-
-				try {
-					await execaInDirectory('npm', ['link']);
-					// eslint-disable-next-line unicorn/prefer-optional-catch-binding
-				} catch (_) {
-					task.skip('npm link failed, please try running with sudo');
-				}
-			}
-		}
-	]);
-
-	console.log();
 	return tasks.run();
 };
+
+export default createInkApp;
