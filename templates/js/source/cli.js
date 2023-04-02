@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env NODE_ENV=production node
 import React from 'react';
 import {render} from 'ink';
 import meow from 'meow';
