@@ -6,23 +6,18 @@ import App from './app.js';
 
 const cli = meow(
 	`
-	Usage
-	  $ %NAME%
+		Usage
+		  $ %NAME%
 
-	Options
-		--name  Your name
+		Options
+			--name  Your name
 
-	Examples
-	  $ %NAME% --name=Jane
-	  Hello, Jane
-`,
+		Examples
+		  $ %NAME% --name=Jane
+		  Hello, Jane
+	`,
 	{
 		importMeta: import.meta,
-		flags: {
-			name: {
-				type: 'string',
-			},
-		},
 	},
 );
 

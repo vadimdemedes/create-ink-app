@@ -5,7 +5,7 @@ import {render} from 'ink-testing-library';
 import App from './source/app.js';
 
 test('greet unknown user', t => {
-	const {lastFrame} = render(<App />);
+	const {lastFrame} = render(<App name={undefined} />);
 
 	t.is(lastFrame(), `Hello, ${chalk.green('Stranger')}`);
 });

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-'use strict';
-const path = require('path');
-const meow = require('meow');
-const createInkApp = require('.');
+import process from 'node:process';
+import path from 'node:path';
+import meow from 'meow';
+import createInkApp from './index.js';
 
 const cli = meow(
 	`
@@ -17,30 +17,45 @@ const cli = meow(
 		$ create-ink-app .
 `,
 	{
+		importMeta: import.meta,
 		flags: {
 			typescript: {
-				type: 'boolean'
-			}
-		}
-	}
+				type: 'boolean',
+			},
+		},
+	},
 );
 
 const projectDirectoryPath = path.resolve(process.cwd(), cli.input[0] || '.');
 
-createInkApp(projectDirectoryPath)
-	.catch(error => {
-		console.error(error.stack);
-		process.exit(1);
-	})
-	.then(() => {
-		const pkgName = path.basename(projectDirectoryPath);
-		const relativePath = path.relative(process.cwd(), projectDirectoryPath);
+try {
+	console.log();
+	await createInkApp(projectDirectoryPath, cli.flags);
 
-		console.log();
-		console.log('Ink app created! Get started with:');
-		console.log();
-		if (relativePath) {
-			console.log(`  cd ${relativePath}`);
-		}
-		console.log(`  ${pkgName}`);
-	});
+	const pkgName = path.basename(projectDirectoryPath);
+	const relativePath = path.relative(process.cwd(), projectDirectoryPath);
+
+	console.log(
+		[
+			'',
+			`Ink app created in ${relativePath ?? 'the current directory'}:`,
+			relativePath ? `  $ cd ${relativePath}` : undefined,
+			relativePath ? '' : undefined,
+			'Build:',
+			'  $ npm run build',
+			'',
+			'Watch and rebuild:',
+			'  $ npm run dev',
+			'',
+			'Run:',
+			`  $ ${pkgName}`,
+			'',
+		]
+			.filter(line => line !== undefined)
+			.map(line => `  ${line}`)
+			.join('\n'),
+	);
+} catch (error) {
+	console.error(error.stack);
+	process.exit(1);
+}
