@@ -10,6 +10,7 @@ import {execa} from 'execa';
 import Listr from 'listr';
 import cpy from 'cpy';
 
+const copyFile = promisify(fs.copyFile);
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 
@@ -71,11 +72,14 @@ const createInkApp = (
 										toPath(projectDirectoryPath, 'readme.md'),
 										variables,
 									),
+									copyFile(
+										fromPath('../_common/_.gitignore'),
+										toPath(projectDirectoryPath, '.gitignore'),
+									),
 									cpy(
 										[
 											fromPath('../_common/.editorconfig'),
 											fromPath('../_common/.gitattributes'),
-											fromPath('../_common/.gitignore'),
 											fromPath('../_common/.prettierignore'),
 										],
 										projectDirectoryPath,
