@@ -1,6 +1,6 @@
 {
 	"name": "create-ink-app",
-	"version": "3.0.0",
+	"version": "3.0.1",
 	"description": "Generate a starter Ink app",
 	"license": "MIT",
 	"repository": "vadimdemedes/create-ink-app",
