@@ -1,30 +1,25 @@
 import process from 'node:process';
 import {fileURLToPath} from 'node:url';
-import {promisify} from 'node:util';
 import path from 'node:path';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import makeDir from 'make-dir';
 import replaceString from 'replace-string';
 import slugify from 'slugify';
 import {execa} from 'execa';
 import Listr from 'listr';
-import cpy from 'cpy';
-
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
 
 const copyWithTemplate = async (from, to, variables) => {
 	const dirname = path.dirname(to);
 	await makeDir(dirname);
 
-	const source = await readFile(from, 'utf8');
+	const source = await fs.readFile(from, 'utf8');
 	let generatedSource = source;
 
 	if (typeof variables === 'object') {
 		generatedSource = replaceString(source, '%NAME%', variables.name);
 	}
 
-	await writeFile(to, generatedSource);
+	await fs.writeFile(to, generatedSource);
 };
 
 const createInkApp = (
@@ -60,68 +55,88 @@ const createInkApp = (
 						{
 							title: 'Common files',
 							async task() {
-								return Promise.all([
-									copyWithTemplate(
-										fromPath('_package.json'),
-										toPath(projectDirectoryPath, 'package.json'),
-										variables,
-									),
-									copyWithTemplate(
-										fromPath('../_common/readme.md'),
-										toPath(projectDirectoryPath, 'readme.md'),
-										variables,
-									),
-									cpy(
-										[
-											fromPath('../_common/.editorconfig'),
-											fromPath('../_common/.gitattributes'),
-											fromPath('../_common/.gitignore'),
-											fromPath('../_common/.prettierignore'),
-										],
-										projectDirectoryPath,
-										{flat: true},
-									),
-								]);
+								await copyWithTemplate(
+									fromPath('_package.json'),
+									toPath(projectDirectoryPath, 'package.json'),
+									variables,
+								);
+
+								await copyWithTemplate(
+									fromPath('../_common/readme.md'),
+									toPath(projectDirectoryPath, 'readme.md'),
+									variables,
+								);
+
+								await fs.copyFile(
+									fromPath('../_common/_editorconfig'),
+									toPath(projectDirectoryPath, '.editorconfig'),
+								);
+
+								await fs.copyFile(
+									fromPath('../_common/_gitattributes'),
+									toPath(projectDirectoryPath, '.gitattributes'),
+								);
+
+								await fs.copyFile(
+									fromPath('../_common/_gitignore'),
+									toPath(projectDirectoryPath, '.gitignore'),
+								);
+
+								await fs.copyFile(
+									fromPath('../_common/_prettierignore'),
+									toPath(projectDirectoryPath, '.prettierignore'),
+								);
 							},
 						},
 						{
 							title: 'JavaScript files',
 							enabled: () => !typescript,
 							async task() {
-								return Promise.all([
-									cpy(
-										fromPath('source/app.js'),
-										toPath(projectDirectoryPath, 'source'),
-									),
-									copyWithTemplate(
-										fromPath('source/cli.js'),
-										toPath(projectDirectoryPath, 'source/cli.js'),
-										variables,
-									),
-									cpy(fromPath('test.js'), projectDirectoryPath, {flat: true}),
-								]);
+								await makeDir(toPath(projectDirectoryPath, 'source'));
+
+								await fs.copyFile(
+									fromPath('source/app.js'),
+									toPath(projectDirectoryPath, 'source/app.js'),
+								);
+
+								await copyWithTemplate(
+									fromPath('source/cli.js'),
+									toPath(projectDirectoryPath, 'source/cli.js'),
+									variables,
+								);
+
+								await fs.copyFile(
+									fromPath('test.js'),
+									toPath(projectDirectoryPath, 'test.js'),
+								);
 							},
 						},
 						{
 							title: 'TypeScript files',
 							enabled: () => typescript,
 							async task() {
-								return Promise.all([
-									cpy(
-										fromPath('source/app.tsx'),
-										toPath(projectDirectoryPath, 'source'),
-									),
-									copyWithTemplate(
-										fromPath('source/cli.tsx'),
-										toPath(projectDirectoryPath, 'source/cli.tsx'),
-										variables,
-									),
-									cpy(
-										[fromPath('test.tsx'), fromPath('tsconfig.json')],
-										projectDirectoryPath,
-										{flat: true},
-									),
-								]);
+								await makeDir(toPath(projectDirectoryPath, 'source'));
+
+								await fs.copyFile(
+									fromPath('source/app.tsx'),
+									toPath(projectDirectoryPath, 'source/app.tsx'),
+								);
+
+								await copyWithTemplate(
+									fromPath('source/cli.tsx'),
+									toPath(projectDirectoryPath, 'source/cli.tsx'),
+									variables,
+								);
+
+								await fs.copyFile(
+									fromPath('test.tsx'),
+									toPath(projectDirectoryPath, 'test.tsx'),
+								);
+
+								await fs.copyFile(
+									fromPath('tsconfig.json'),
+									toPath(projectDirectoryPath, 'tsconfig.json'),
+								);
 							},
 						},
 					]);

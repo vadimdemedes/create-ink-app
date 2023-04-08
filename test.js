@@ -3,18 +3,18 @@ import test from 'ava';
 import {execa} from 'execa';
 import stripAnsi from 'strip-ansi';
 import {temporaryDirectoryTask} from 'tempy';
+import {deleteAsync} from 'del';
 import createInkApp from './index.js';
 
 const temporaryProjectTask = async (type, callback) => {
 	await temporaryDirectoryTask(async temporaryDirectory => {
 		const projectDirectory = path.join(temporaryDirectory, `test-${type}-app`);
+		await deleteAsync(projectDirectory);
 
 		try {
 			await callback(projectDirectory);
 		} finally {
-			await execa('npm', ['unlink', '--global', `test-${type}-app`], {
-				cwd: projectDirectory,
-			});
+			await execa('npm', ['unlink', '--global', `test-${type}-app`]);
 		}
 	});
 };

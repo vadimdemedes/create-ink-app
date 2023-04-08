@@ -41,6 +41,7 @@
 	"devDependencies": {
 		"@vdemedes/prettier-config": "^2.0.1",
 		"ava": "^5.2.0",
+		"del": "^7.0.0",
 		"prettier": "^2.8.7",
 		"strip-ansi": "^7.0.1",
 		"tempy": "^3.0.0",
