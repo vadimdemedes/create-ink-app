@@ -26,20 +26,14 @@
 		"@vdemedes/prettier-config": "^2.0.1",
 		"ava": "^6.4.1",
 		"chalk": "^5.2.0",
-		"eslint-config-xo-react": "^0.27.0",
-		"eslint-plugin-react": "^7.32.2",
-		"eslint-plugin-react-hooks": "^4.6.0",
 		"ink-testing-library": "^4.0.0",
-		"prettier": "^2.8.7",
+		"prettier": "^3.6.2",
 		"typescript": "^5.0.3",
-		"xo": "^0.53.1"
+		"xo": "^1.2.1"
 	},
 	"ava": {
 		"typescript": {
-			"extensions": [
-				"ts",
-				"tsx"
-			],
+			"extensions": ["ts", "tsx"],
 			"rewritePaths": {
 				"source/": "dist/"
 			},
@@ -47,11 +41,8 @@
 		}
 	},
 	"xo": {
-		"extends": "xo-react",
-		"prettier": true,
-		"rules": {
-			"react/prop-types": "off"
-		}
+		"prettier": "compat",
+		"react": true
 	},
 	"prettier": "@vdemedes/prettier-config"
 }
