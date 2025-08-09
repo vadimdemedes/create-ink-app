@@ -40,7 +40,10 @@
 	},
 	"xo": {
 		"react": true,
-		"prettier": "compat"
+		"prettier": "compat",
+		"rules": {
+			"react/prop-types": "off"
+		}
 	},
 	"prettier": "@vdemedes/prettier-config",
 	"babel": {
