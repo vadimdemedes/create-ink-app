@@ -129,8 +129,8 @@ const createInkApp = (
 								);
 
 								await fs.copyFile(
-									fromPath('test.tsx'),
-									toPath(projectDirectoryPath, 'test.tsx'),
+									fromPath('source/test.tsx'),
+									toPath(projectDirectoryPath, 'source/test.tsx'),
 								);
 
 								await fs.copyFile(

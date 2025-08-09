@@ -29,8 +29,8 @@
 		"eslint-plugin-react-hooks": "^4.6.0",
 		"import-jsx": "^5.0.0",
 		"ink-testing-library": "^3.0.0",
-		"prettier": "^2.8.7",
-		"xo": "^0.53.1"
+		"prettier": "^3.6.2",
+		"xo": "^1.2.1"
 	},
 	"ava": {
 		"environmentVariables": {
@@ -39,8 +39,8 @@
 		"nodeArguments": ["--loader=import-jsx"]
 	},
 	"xo": {
-		"extends": "xo-react",
-		"prettier": true,
+		"react": true,
+		"prettier": "compat",
 		"rules": {
 			"react/prop-types": "off"
 		}

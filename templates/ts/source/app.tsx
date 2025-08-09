@@ -1,9 +1,9 @@
 import React from 'react';
 import {Text} from 'ink';
 
-type Props = {
+type Props = Readonly<{
 	name: string | undefined;
-};
+}>;
 
 export default function App({name = 'Stranger'}: Props) {
 	return (
