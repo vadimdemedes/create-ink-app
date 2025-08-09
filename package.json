@@ -42,19 +42,23 @@
 		"@vdemedes/prettier-config": "^2.0.1",
 		"ava": "^5.2.0",
 		"del": "^7.0.0",
-		"prettier": "^2.8.7",
+		"prettier": "^3.6.2",
 		"strip-ansi": "^7.0.1",
 		"tempy": "^3.0.0",
-		"xo": "^0.53.1"
+		"xo": "^1.2.1"
 	},
 	"ava": {
 		"timeout": "5m"
 	},
-	"xo": {
-		"prettier": true,
-		"ignores": [
-			"templates/**"
-		]
-	},
+	"xo": [
+		{
+			"prettier": "compat"
+		},
+		{
+			"ignores": [
+				"templates/**"
+			]
+		}
+	],
 	"prettier": "@vdemedes/prettier-config"
 }
