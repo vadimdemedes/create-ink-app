@@ -1,6 +1,5 @@
 name: test
 on: [push, pull_request]
-
 jobs:
   test:
     name: Node.js ${{ matrix.node_version }}
@@ -11,11 +10,10 @@ jobs:
         # Node 22 blocked by import-jsx import assertions issue:
         # https://github.com/vadimdemedes/import-jsx/issues/20
         node_version: [20]
-
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js ${{ matrix.node_version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node_version }}
       - run: npm install
