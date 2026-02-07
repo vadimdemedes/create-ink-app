@@ -8,7 +8,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node_version: [20, 22]
+        # Node 22 blocked by import-jsx import assertions issue:
+        # https://github.com/vadimdemedes/import-jsx/issues/20
+        node_version: [20]
 
     steps:
       - uses: actions/checkout@v4
