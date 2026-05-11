@@ -7,6 +7,8 @@ import replaceString from 'replace-string';
 import slugify from 'slugify';
 import {execa} from 'execa';
 import Listr from 'listr';
+import select from '@inquirer/select';
+import {getExecCommand, getExecArgs} from './utils/index.js';
 
 const copyWithTemplate = async (from, to, variables) => {
 	const dirname = path.dirname(to);
@@ -22,7 +24,7 @@ const copyWithTemplate = async (from, to, variables) => {
 	await fs.writeFile(to, generatedSource);
 };
 
-const createInkApp = (
+const createInkApp = async (
 	projectDirectoryPath = process.cwd(),
 	{typescript, silent},
 ) => {
@@ -41,6 +43,21 @@ const createInkApp = (
 		path.join(path.resolve(__dirname, templatePath), file);
 
 	const toPath = (rootPath, file) => path.join(rootPath, file);
+
+	const packageManager = await select(
+		{
+			message: 'Which package manager would you like to use?',
+			default: 'npm',
+			choices: [
+				{name: 'npm', value: 'npm'},
+				{name: 'yarn', value: 'yarn'},
+				{name: 'pnpm', value: 'pnpm'},
+			],
+		},
+		{
+			clearPromptOnDone: true,
+		},
+	);
 
 	const tasks = new Listr(
 		[
@@ -143,30 +160,38 @@ const createInkApp = (
 				},
 			},
 			{
-				title: 'Install dependencies',
+				title: 'Install dependencies (`' + packageManager + ' install`)',
 				async task() {
-					await execaInDirectory('npm', ['install']);
+					await execaInDirectory(packageManager, ['install']);
 				},
 			},
 			{
 				title: 'Format code',
 				task() {
-					return execaInDirectory('npx', ['prettier', '--write', '.']);
+					return execaInDirectory(
+						getExecCommand(packageManager),
+						getExecArgs(packageManager, ['prettier', '--write', '.']),
+					);
 				},
 			},
 			{
 				title: 'Build',
 				task() {
-					return execaInDirectory('npm', ['run', 'build']);
+					return execaInDirectory(packageManager, ['run', 'build']);
 				},
 			},
 			{
 				title: 'Link executable',
 				async task(_, task) {
 					try {
-						await execaInDirectory('npm', ['link']);
+						await execaInDirectory(
+							packageManager,
+							packageManager === 'pnpm' ? ['add', '--global', '.'] : ['link'],
+						);
 					} catch {
-						task.skip('`npm link` failed, try running it yourself');
+						task.skip(
+							'`' + packageManager + ' link` failed, try running it yourself',
+						);
 					}
 				},
 			},
