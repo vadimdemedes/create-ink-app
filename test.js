@@ -40,7 +40,7 @@ test.serial('javascript app', async t => {
 test.serial('typescript app', async t => {
 	await temporaryProjectTask('ts', async projectDirectory => {
 		await createInkApp(projectDirectory, {
-			typescript: false,
+			typescript: true,
 			silent: true,
 		});
 
