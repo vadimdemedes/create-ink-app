@@ -5,7 +5,7 @@
 	"bin": "dist/cli.js",
 	"type": "module",
 	"engines": {
-		"node": ">=20"
+		"node": ">=22"
 	},
 	"scripts": {
 		"build": "babel --out-dir=dist source",
@@ -15,17 +15,17 @@
 	},
 	"files": ["dist"],
 	"dependencies": {
-		"ink": "^4.1.0",
-		"meow": "^11.0.0",
-		"react": "^18.2.0"
+		"ink": "^7.1.1",
+		"meow": "^14.1.0",
+		"react": "^19.3.0"
 	},
 	"devDependencies": {
-		"@babel/cli": "^7.21.0",
-		"@babel/preset-react": "^7.18.6",
+		"@babel/cli": "^7.26.0",
+		"@babel/preset-react": "^7.26.0",
 		"@vdemedes/prettier-config": "^2.0.1",
 		"ava": "^6.2.0",
-		"chalk": "^5.2.0",
-		"ink-testing-library": "^3.0.0",
+		"chalk": "^5.4.1",
+		"ink-testing-library": "^4.0.0",
 		"prettier": "^3.4.2",
 		"xo": "^1.2.3"
 	},
@@ -33,7 +33,8 @@
 		"react": true,
 		"prettier": "compat",
 		"rules": {
-			"react/prop-types": "off"
+			"react/prop-types": "off",
+			"react/react-in-jsx-scope": "off"
 		}
 	},
 	"prettier": "@vdemedes/prettier-config",

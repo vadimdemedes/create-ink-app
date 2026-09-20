@@ -5,7 +5,7 @@
 	"bin": "dist/cli.js",
 	"type": "module",
 	"engines": {
-		"node": ">=20"
+		"node": ">=22"
 	},
 	"scripts": {
 		"build": "tsc",
@@ -15,20 +15,20 @@
 	},
 	"files": ["dist"],
 	"dependencies": {
-		"ink": "^4.1.0",
-		"meow": "^11.0.0",
-		"react": "^18.2.0"
+		"ink": "^7.1.1",
+		"meow": "^14.1.0",
+		"react": "^19.3.0"
 	},
 	"devDependencies": {
 		"@ava/typescript": "^5.0.0",
-		"@sindresorhus/tsconfig": "^3.0.1",
-		"@types/react": "^18.0.32",
+		"@sindresorhus/tsconfig": "^8.1.0",
+		"@types/react": "^19.3.0",
 		"@vdemedes/prettier-config": "^2.0.1",
 		"ava": "^6.2.0",
-		"chalk": "^5.2.0",
-		"ink-testing-library": "^3.0.0",
+		"chalk": "^5.4.1",
+		"ink-testing-library": "^4.0.0",
 		"prettier": "^3.4.2",
-		"typescript": "^5.0.3",
+		"typescript": "^5.8.3",
 		"xo": "^1.2.3"
 	},
 	"ava": {
@@ -44,7 +44,8 @@
 		"react": true,
 		"prettier": "compat",
 		"rules": {
-			"react/prop-types": "off"
+			"react/prop-types": "off",
+			"react/react-in-jsx-scope": "off"
 		}
 	},
 	"prettier": "@vdemedes/prettier-config"
